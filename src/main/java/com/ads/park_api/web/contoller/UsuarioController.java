@@ -1,5 +1,7 @@
 package com.ads.park_api.web.contoller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ads.park_api.entity.Usuario;
 import com.ads.park_api.service.UsuarioService;
+import com.ads.park_api.web.dto.UsuarioCreateDto;
+import com.ads.park_api.web.dto.UsuarioResponseDto;
+import com.ads.park_api.web.dto.UsuarioSenhaDto;
+import com.ads.park_api.web.dto.mapper.UsuarioMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,22 +29,29 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
 
     @PostMapping
-    public ResponseEntity<Usuario> create(@RequestBody Usuario usuario){
-        Usuario user = usuarioService.salvar(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    public ResponseEntity<UsuarioResponseDto> create(@RequestBody UsuarioCreateDto usuarioCreateDto){
+        Usuario user = usuarioService.salvar(UsuarioMapper.toUsuario(usuarioCreateDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(UsuarioMapper.toDto(user));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Usuario> getById(@PathVariable Long id){
+    public ResponseEntity<UsuarioResponseDto> getById(@PathVariable Long id){
         Usuario user = usuarioService.buscarPorId(id);
-        return ResponseEntity.status(HttpStatus.OK).body(user);
+        return ResponseEntity.ok(UsuarioMapper.toDto(user));
+    }
+
+    // Listar todos os usuários
+    @GetMapping
+    public ResponseEntity<List<UsuarioResponseDto>> getAllUsers() {
+        List<Usuario> users = usuarioService.buscarTodos();
+        return ResponseEntity.ok(UsuarioMapper.toDtoList(users));
     }
 
     // PatchMapping to update user password
     @PatchMapping("/{id}")
-    public ResponseEntity<Usuario> updatePassword(@PathVariable Long id, @RequestBody Usuario usuario) {
-        Usuario user = usuarioService.editarSenha(id, usuario.getPassword());
-        return ResponseEntity.status(HttpStatus.OK).body(user);
+    public ResponseEntity<Void> updatePassword(@PathVariable Long id, @RequestBody UsuarioSenhaDto dto) {
+       Usuario user = usuarioService.editarSenha(id, dto.getSenhaAtual(), dto.getNovaSenha(), dto.getConfirmaSenha());
+        return ResponseEntity.noContent().build();
     }
 
 }

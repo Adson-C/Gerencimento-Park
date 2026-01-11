@@ -3,6 +3,9 @@ package com.ads.park_api.service;
 import com.ads.park_api.entity.Usuario;
 import com.ads.park_api.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,10 +30,21 @@ public class UsuarioService {
     }
 
     @Transactional
-	public Usuario editarSenha(Long id, String newPassword) {
+	public Usuario editarSenha(Long id, String senhaAtual, String novaSenha, String confirmaSenha) {
 		Usuario user = buscarPorId(id);
-		user.setPassword(newPassword);
+		if (!user.getPassword().equals(senhaAtual)) {
+			throw new RuntimeException("Senha atual não confere");
+		}
+		if (!novaSenha.equals(confirmaSenha)) {
+			throw new RuntimeException("As senhas não coincidem");
+		}
+		user.setPassword(novaSenha);
 		return user;
+	}
+
+    @Transactional(readOnly = true)
+	public List<Usuario> buscarTodos() {
+        return usuarioRepository.findAll();
 	}
 
 }
