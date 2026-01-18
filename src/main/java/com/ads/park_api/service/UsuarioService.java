@@ -1,13 +1,18 @@
 package com.ads.park_api.service;
 
-import com.ads.park_api.entity.Usuario;
-import com.ads.park_api.repository.UsuarioRepository;
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ads.park_api.entity.Usuario;
+import com.ads.park_api.exception.EntityNotFoundException;
+import com.ads.park_api.exception.PasswordInvalidException;
+import com.ads.park_api.exception.UserNameUniqueViolationException;
+import com.ads.park_api.repository.UsuarioRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
@@ -17,14 +22,18 @@ public class UsuarioService {
 
     @Transactional
     public Usuario salvar(Usuario usuario) {
+        try {
         return usuarioRepository.save(usuario);
+        } catch (DataIntegrityViolationException ex) {
+            throw new UserNameUniqueViolationException(String.format("UserName {%s} já existe", usuario.getUsername()));
+        }
     }
 
     @Transactional(readOnly = true)
     public Usuario buscarPorId(Long id) {
 
         return usuarioRepository.findById(id).orElseThrow(
-            () -> new RuntimeException("Usuário não encontrado com id: " + id)
+            () -> new EntityNotFoundException(String.format("Usuário com id=%s não encontrado", id))
         );
 
     }
@@ -33,10 +42,10 @@ public class UsuarioService {
 	public Usuario editarSenha(Long id, String senhaAtual, String novaSenha, String confirmaSenha) {
 		Usuario user = buscarPorId(id);
 		if (!user.getPassword().equals(senhaAtual)) {
-			throw new RuntimeException("Senha atual não confere");
+			throw new PasswordInvalidException(String.format("Senha atual não confere"));
 		}
 		if (!novaSenha.equals(confirmaSenha)) {
-			throw new RuntimeException("As senhas não coincidem");
+			throw new PasswordInvalidException(String.format("As senhas não coincidem"));
 		}
 		user.setPassword(novaSenha);
 		return user;
