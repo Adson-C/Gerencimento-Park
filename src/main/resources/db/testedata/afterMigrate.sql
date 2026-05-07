@@ -1,14 +1,14 @@
 set foreign_key_checks = 0;
 
-delete from usuarios;
+delete from usuario;
 
 set foreign_key_checks = 1;
 
-alter table usuarios AUTO_INCREMENT = 1;
+alter table usuario AUTO_INCREMENT = 1;
 
 
-INSERT INTO usuarios (username, password, role, data_criacao, data_motificacao, criado_por, modificado_por)
-VALUES 
-('admin', 'hashed_password_here', 'ADMIN', NOW(), NULL, 'system', NULL),
-('user1', 'hashed_password_here', 'USER', NOW(), NULL, 'system', NULL),
-('user2', 'hashed_password_here', 'USER', NOW(), NULL, 'system', NULL);
+INSERT INTO usuario (username, password, role, data_criacao, data_motificacao, criado_por, modificado_por)
+VALUES
+('admin@yahoo.com.br', '123456', 'ROLE_ADMIN', NOW(), NULL, 'system', NULL),
+('adson@gmail.com.br', '123456', 'ROLE_CLIENTE', NOW(), NULL, 'system', NULL),
+('john@gmail.com.br', '123456', 'ROLE_CLIENTE', NOW(), NULL, 'system', NULL);
