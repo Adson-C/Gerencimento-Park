@@ -34,7 +34,7 @@ public class ErrorMessage implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Map<String, String> errors;
 
-    public ErrorMessage() {}
+    public ErrorMessage(HttpServletRequest request, int value, String usuárioOuSenhaInválidos) {}
 
 
     public ErrorMessage(HttpServletRequest request, HttpStatus status, String message) {
